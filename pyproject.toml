@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hrvanalysis"
+dynamic = ["version"]
+readme = "README.md"
+license = { file = "LICENSE" }
+description = "Short description."
+authors = [{ name = "Ana Sofia Carmo", email = "anascacais@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent"
+]
+dependencies = [
+  "biosppy",
+  "numpy",
+  "pandas",
+  "scipy",
+  "peakutils",
+  "plotly"
+]
+
+[project.urls]
+Repository = "https://github.com/anascacais/hrvanalysis"
+
+[tool.setuptools.dynamic]
+version = {attr = "hrvanalysis.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hrvanalysis"]
