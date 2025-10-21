@@ -19,7 +19,8 @@ dependencies = [
   "pandas",
   "scipy",
   "peakutils",
-  "plotly"
+  "plotly",
+  "EMD-signal",
 ]
 
 [project.urls]

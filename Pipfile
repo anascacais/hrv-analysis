@@ -11,6 +11,7 @@ scipy = "*"
 peakutils = "*"
 plotly = "*"
 plotly-resampler = "*"
+emd-signal = "*"
 
 [dev-packages]
 

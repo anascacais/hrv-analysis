@@ -293,4 +293,4 @@ def filter_hq_segments(signal, sqi, fs, win_duration):
     segments = np.vstack(segments)
     ts = np.vstack(ts)
 
-    return segments, ts[:, 1]
+    return segments, ts[:, 0]
