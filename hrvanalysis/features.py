@@ -27,10 +27,10 @@ def get_hrv_features(segments, ts, fs, feature_list, feature_names, fbands=None)
     Returns
     -------
     df : pd.DataFrame
-        DataFrame with columns ["timedelta", "name", "value"], where each entry corresponds to a single feature extracted from a single segment. Lenght is equal to #segments * #HRV features.
+        DataFrame with columns ["start_timedelta", "name", "value"], where each entry corresponds to a single feature extracted from a single segment. Lenght is equal to #segments * #HRV features.
     '''
 
-    df = pd.DataFrame(columns=['timedelta', 'name', 'value'])
+    df = pd.DataFrame(columns=['start_timedelta', 'name', 'value'])
     hrv_features = {}
     fs = float(fs)
 
@@ -105,7 +105,7 @@ def hrv_frequencydomain(rri, sampling_rate):
 
     LF_power, HF_power = 0, 0
 
-    print(f"Number of IMFs: {imfs.shape[0]}")
+    # print(f"Number of IMFs: {imfs.shape[0]}")
 
     # Step 2: Select IMFs corresponding to LF (0.038–0.15 Hz) and HF (0.15–0.6 Hz)
     # A simple approach: compute mean instantaneous frequency for each IMF and select
@@ -133,9 +133,9 @@ def hrv_frequencydomain(rri, sampling_rate):
 
     LF_HF_ratio = LF_power / HF_power if HF_power != 0 else np.nan
 
-    print(
-        f'LF Power: {LF_power}, HF Power: {HF_power}, LF/HF Ratio: {LF_HF_ratio}')
-    return {'lf_pwr': LF_power, 'hf_pwr': HF_power, 'lf_hf': LF_HF_ratio}
+    # print(
+    #     f'LF Power: {LF_power}, HF Power: {HF_power}, LF/HF Ratio: {LF_HF_ratio}')
+    return {'lf_pwr': LF_power*1000., 'hf_pwr': HF_power*1000., 'lf_hf': LF_HF_ratio}
 
 
 def _calc_inst_freq(imfs, t, order=False, alpha=None):

@@ -90,7 +90,7 @@ def quantify_quality(quality, metric):
     elif metric == 'peak_amplitude':
         sqi[np.where(quality <= 10)] = 1
     elif metric == 'template_corr':
-        sqi[np.where(quality > 0.8)] = 1
+        sqi[np.where(quality > 0.7)] = 1
     else:
         raise ValueError(
             f'{metric} is not a valid quality index. Choose between "peak_amplitude", "template_corr", and "HR".')

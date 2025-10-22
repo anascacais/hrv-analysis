@@ -73,39 +73,54 @@ def get_filtered_ecg_df(signal, fs, ftype='FIR', band='bandpass', frequency=[0.6
     )
 
     if check_if_inverted:
-        (segment_peaks,) = bp.signals.ecg.hamilton_segmenter(
-            filtered, sampling_rate=fs)
-        (rpeaks,) = bp.signals.ecg.correct_rpeaks(
-            filtered, segment_peaks, sampling_rate=fs)
-
-        (segment_peaks,) = bp.signals.ecg.hamilton_segmenter(
-            (-1)*filtered, sampling_rate=fs)
-        (rpeaks_inv,) = bp.signals.ecg.correct_rpeaks(
-            (-1)*filtered, segment_peaks, sampling_rate=fs)
-
-        # Hungarian algorithm
-        cost = np.abs(np.subtract.outer(rpeaks, rpeaks_inv))
-        row_ind, col_ind = linear_sum_assignment(cost)
-        pairs = [(rpeaks[i], rpeaks_inv[j]) for i, j in zip(row_ind, col_ind)]
-        negative_diff = sum(d < 0 for d in [i - j for i, j in pairs])
-
-        if negative_diff < len(pairs) * 0.5:
-            print(
-                f'\nINVERTED ECG DETECTED.')
-
-            plot_channels(pd.DataFrame({'time': ts, 'original': filtered, 'inverted': (-1)*filtered}), channels=[
-                "original", "inverted"], datetime_as_index=True, use_display=use_display)
-
-            resp = input('\nShould we proceed with signal inversion? (y/n): ')
-            if resp.lower() == 'y':
-                filtered = (-1) * filtered
-                print('Signal inverted.\n')
+        filtered = check_ecg_inversion(filtered, ts, fs, use_display)
 
     ecg_df = pd.DataFrame(
         {'time': ts, 'Bipolar ECG': np.reshape(signal, (-1,))})
     ecg_df['Filtered ECG'] = filtered - np.mean(filtered)
 
     return ecg_df
+
+
+def check_ecg_inversion(signal, ts, fs, use_display):
+
+    (segment_peaks,) = bp.signals.ecg.hamilton_segmenter(
+        signal, sampling_rate=fs)
+    (rpeaks,) = bp.signals.ecg.correct_rpeaks(
+        signal, segment_peaks, sampling_rate=fs)
+
+    (segment_peaks,) = bp.signals.ecg.hamilton_segmenter(
+        (-1)*signal, sampling_rate=fs)
+    (rpeaks_inv,) = bp.signals.ecg.correct_rpeaks(
+        (-1)*signal, segment_peaks, sampling_rate=fs)
+
+    # Hungarian algorithm
+    cost = np.abs(np.subtract.outer(rpeaks, rpeaks_inv))
+    row_ind, col_ind = linear_sum_assignment(cost)
+    pairs = [(rpeaks[i], rpeaks_inv[j]) for i, j in zip(row_ind, col_ind)]
+    negative_diff = sum(d < 0 for d in [i - j for i, j in pairs])
+
+    if negative_diff < len(pairs) * 0.5:
+        print(
+            f'\nINVERTED ECG DETECTED.')
+
+        plot_channels(pd.DataFrame({'time': ts, 'original': signal, 'inverted': (-1)*signal}), channels=[
+            "original", "inverted"], datetime_as_index=True, use_display=use_display)
+
+        while True:
+            resp = input('\nShould we proceed with signal inversion? (y/n): ')
+            if resp.lower() == 'y':
+                signal = (-1) * signal
+                print('Signal inverted.\n')
+                break
+            elif resp.lower() == 'n':
+                print('Signal not inverted.\n')
+                break
+            else:
+                print('Invalid input. Please enter "y" or "n".')
+                continue
+
+    return signal
 
 
 def get_rpeaks(signal, fs):
